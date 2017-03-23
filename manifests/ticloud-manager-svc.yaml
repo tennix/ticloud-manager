@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticloud-manager
+spec:
+  type: NodePort
+  ports:
+  - name: ticloud
+    port: 2333
+    targetPort: 2333
+    nodePort: 32333
+  selector:
+    app: ticloud-manager

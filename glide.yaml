@@ -1,0 +1,12 @@
+package: github.com/tennix/tidb-ucloud-manager
+import:
+- package: github.com/labstack/echo
+- package: github.com/ngaut/log
+- package: github.com/pingcap/tidb-operator/pkg/controller
+- package: k8s.io/kubernetes
+  version: release-1.5
+  subpackages:
+    - pkg/api
+    - pkg/labels
+    - pkg/client/restclient
+    - pkg/client/clientset_generated/internalclientset

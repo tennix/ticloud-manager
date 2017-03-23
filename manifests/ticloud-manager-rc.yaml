@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ticloud-manager
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: ticloud-manager
+        app: ticloud-manager
+    spec:
+      containers:
+      - name: ticloud-manager
+        image: pingcap//tiucloud-manager:ucloud-v0.1.0
+        command: ["/usr/local/bin/ticloud-manager"]
+        args: ["-L=info"]
+        volumeMounts:
+        - name: timezone
+          mountPath: /etc/localtime
+      volumes:
+      - name: timezone
+        hostPath:
+          path: /etc/localtime
