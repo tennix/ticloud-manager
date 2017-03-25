@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -23,9 +24,11 @@ const (
 )
 
 var (
-	kubeCli  *clientset.Clientset
-	logLevel string
-	repo     string
+	kubeCli        *clientset.Clientset
+	logLevel       string
+	repo           string
+	tikvConfigTmpl *template.Template
+	pdConfigTmpl   *template.Template
 )
 
 type Instance struct {
@@ -76,9 +79,23 @@ func init() {
 	flag.Parse()
 	log.SetLevelByString(logLevel)
 	log.SetHighlighting(true)
+	b1, err := ioutil.ReadFile("/pd.toml.tmpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pdConfigTmpl = template.Must(template.New("pd-config").Parse(string(b1)))
+	b2, err := ioutil.ReadFile("/tikv.toml.tmpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tikvConfigTmpl = template.Must(template.New("tikv-config").Parse(string(b2)))
 }
 
 func createCluster(host, namespace string, instance Instance) error {
+	err := createTidbMonitor(namespace, instance.ID)
+	if err != nil {
+		log.Errorf("error creating %s-tidb-monitor", instance.ID)
+	}
 	restClient, ok := kubeCli.Core().RESTClient().(*restclient.RESTClient)
 	if !ok {
 		log.Fatal("kubeclient initialize failed")
@@ -187,6 +204,10 @@ func deleteCluster(host, namespace, id string) error {
 		return err
 	}
 	log.Debugf("response: %s", string(b))
+	err = deleteTidbMonitor(namespace, id)
+	if err != nil {
+		log.Errorf("error deleting %s-tidb-monitor", id)
+	}
 	return nil
 }
 

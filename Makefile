@@ -7,7 +7,7 @@ update:
 	glide up --strip-vendor --strip-vcs
 
 ucloud-build:
-	$(GO) build -o bin/ticloud-manager ucloud/main.go
+	cd ucloud && $(GO) build -o ../bin/ticloud-manager
 
 ucloud-docker: ucloud-build
 	mkdir -p docker/bin && cp bin/ticloud-manager docker/bin/ticloud-manager

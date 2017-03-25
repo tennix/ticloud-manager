@@ -12,9 +12,9 @@ spec:
     spec:
       containers:
       - name: ticloud-manager
-        image: pingcap//tiucloud-manager:ucloud-v0.1.0
+        image: pingcap/ticloud-manager:ucloud-v0.1.0
         command: ["/usr/local/bin/ticloud-manager"]
-        args: ["-L=info"]
+        args: ["-L=info", "-repo=uhub.service.ucloud.cn/pingcap"]
         volumeMounts:
         - name: timezone
           mountPath: /etc/localtime
