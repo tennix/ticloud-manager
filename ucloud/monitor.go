@@ -90,7 +90,7 @@ func exposeGrafana(namespace, clusterName string) error {
 			Labels: labels,
 		},
 		Spec: api.ServiceSpec{
-			Type: "NodePort", // NodePort, ClusterIP, LoadBalancer
+			Type: "LoadBalancer", // NodePort, ClusterIP, LoadBalancer
 			Ports: []api.ServicePort{
 				{
 					Name:       "grafana",
