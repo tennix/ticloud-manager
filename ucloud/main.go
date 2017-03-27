@@ -51,6 +51,7 @@ type Instance struct {
 	CreatedAt          time.Time `json:"createdAt,omitempty"`
 	RunningStatus      string    `json:"runningStatus,omitempty"` // creating, running, terminated
 	EIP                string    `json:"eip,omitempty"`
+	MonitorIP          string    `json:"monitorIp,omitempty"` // grafana port 3000
 }
 
 type Response struct {
@@ -285,6 +286,10 @@ func getCluster(host, namespace, clusterName string) (*Instance, error) {
 	}
 	if instance.PdNodes == 0 || instance.TidbNodes == 0 || instance.TikvNodes == 0 {
 		return instance, nil // creating
+	}
+	monitorSvc, err := kubeCli.Services(namespace).Get(fmt.Sprintf("%s-tidb-monitor-grafana", clusterName))
+	if err == nil && len(monitorSvc.Status.LoadBalancer.Ingress) != 0 {
+		instance.MonitorIP = monitorSvc.Status.LoadBalancer.Ingress[0].IP
 	}
 	svc, err := kubeCli.Services(namespace).Get(fmt.Sprintf("%s-tidb", clusterName))
 	if err == nil && len(svc.Status.LoadBalancer.Ingress) != 0 {
